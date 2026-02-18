@@ -1,0 +1,92 @@
+flowchart TB
+subgraph STUDENT["🎓 STUDENT FLOW (Mobile/Web)"]
+    direction TB
+        S1(("Start"))
+        S2["Open App"]
+        S3{"User Type?"}
+        
+        %% New User Flow
+        S4_NEW["Sign Up"]
+        S5_NEW["Create Account Enter Details"]
+        S6_NEW["Complete Profile Basic Information"]
+        S7_NEW["Onboarding Tutorial How to Use App"]
+        
+        %% Existing User Flow
+        S4_EXIST["Login"]
+        S5_EXIST["Enter Credentials"]
+        
+        %% Common Flow After Authentication (nodes to be kept)
+        S8["Student Dashboard View Last Risk Result"]
+        S9["Add New Entry"]
+        S10("Fill Questionnaire Academic Lifestyle Emotional")
+        S11["Submit Form"]
+        S12["Data Validation Range and Missing Checks"]
+        S18["View Historical Trends Weekly Monthly Graphs"]
+        S19(("Finish Return to Dashboard"))
+end
+
+subgraph COUNSELLOR["👨‍⚕️ COUNSELLOR / ADMIN FLOW (Web)"]
+    direction TB
+        C1(("Start"))
+        C2["Login Counsellor/Admin"]
+        C3{"Select Role?"}
+        C4["Admin Dashboard Risk Distribution Alerts Filters"]
+        C5{"What action?"}
+        C6[["Student List Search Student"]]
+        C7["Student Detail Risk Timeline Trend Charts SHAP Factors"]
+        C8["Upload CSV File"]
+        C9["Batch Scoring Pipeline Processing"]
+        C10["Risk Distribution Report Generated"]
+        C11["Analytics and Insights Institution Metrics Heatmaps Export"]
+        C12(("Finish Logout"))
+end
+
+subgraph STRETCH["🚀 STRETCH FEATURES"]
+    direction TB
+        SF1["Notifications: Rising Risk Alert"]
+        SF2["Offline Entry Sync"]
+        SF3["Multi-language Support"]
+        SF4["Role-Based Access Control"]
+        SF5["Personalized Baselines"]
+end
+
+%% Student Flow Connections
+S1 --> S2
+S2 --> S3
+S3 -- "New User" --> S4_NEW
+S3 -- "Existing User" --> S4_EXIST
+
+%% New User Path
+S4_NEW --> S5_NEW
+S5_NEW --> S6_NEW
+S6_NEW --> S7_NEW
+S7_NEW --> S8
+
+%% Existing User Path
+S4_EXIST --> S5_EXIST
+S5_EXIST --> S8
+
+%% Common Path
+S8 --> S9
+S9 --> S10
+S10 --> S11
+S11 --> S12
+S12 --> S18
+S18 --> S19
+
+%% Counsellor Flow Connections
+C1 --> C2
+C2 --> C3
+C3 -- Counsellor --> C4
+C4 --> C5
+C5 -- "View Student" --> C6
+C6 --> C7
+C5 -- "Batch Upload" --> C8
+C8 --> C9
+C9 --> C10
+C7 --> C11
+C10 --> C11
+C11 --> C12
+
+%% Stretch Features Connection
+STRETCH -- Enhances --> STUDENT & COUNSELLOR
