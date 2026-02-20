@@ -1,0 +1,78 @@
+flowchart TB
+
+%% =========================
+%% CLIENT LAYER
+%% =========================
+subgraph CLIENT_LAYER["Client Layer"]
+    STUDENT_APP["Mobile App (Student)"]
+    WEB_DASH["Web Dashboard (Admin / Counsellor)"]
+end
+
+%% =========================
+%% API LAYER
+%% =========================
+API["API Layer (FastAPI REST APIs)"]
+
+STUDENT_APP --> API
+WEB_DASH --> API
+
+%% =========================
+%% BACKEND SERVICES
+%% =========================
+subgraph BACKEND_SERVICES["Backend Services"]
+    AUTH["Authentication Service (JWT Role Based)"]
+    STUDENT_SERVICE["Student Service (Indicators and History)"]
+    PREDICTION_SERVICE["ML Prediction Service"]
+    EXPLAIN_SERVICE["SHAP Explainability Service"]
+    ANALYTICS_SERVICE["Analytics Service"]
+    BATCH_SERVICE["Batch CSV Processing Service"]
+end
+
+API --> AUTH
+API --> STUDENT_SERVICE
+API --> PREDICTION_SERVICE
+API --> EXPLAIN_SERVICE
+API --> ANALYTICS_SERVICE
+API --> BATCH_SERVICE
+
+%% =========================
+%% DATA LAYER
+%% =========================
+subgraph DATA_LAYER["Data Layer"]
+    POSTGRES["PostgreSQL Users Indicators Predictions"]
+end
+
+AUTH --> POSTGRES
+STUDENT_SERVICE --> POSTGRES
+ANALYTICS_SERVICE --> POSTGRES
+BATCH_SERVICE --> POSTGRES
+EXPLAIN_SERVICE --> POSTGRES
+
+%% =========================
+%% ML LAYER
+%% =========================
+subgraph ML_LAYER["ML Layer"]
+    FEATURE_PIPELINE["Feature Engineering Pipeline"]
+    MODEL["ML Model Random Forest or Logistic Regression"]
+end
+
+PREDICTION_SERVICE --> FEATURE_PIPELINE
+FEATURE_PIPELINE --> MODEL
+MODEL --> PREDICTION_SERVICE
+MODEL --> EXPLAIN_SERVICE
+
+%% =========================
+%% BATCH PIPELINE
+%% =========================
+BATCH_SERVICE --> FEATURE_PIPELINE
+
+%% =========================
+%% DEPLOYMENT
+%% =========================
+subgraph DEPLOYMENT["Deployment Infrastructure"]
+    DOCKER["Docker Container"]
+    EC2["AWS EC2 Deployment"]
+end
+
+API --> DOCKER
+DOCKER --> EC2
