@@ -1,2 +1,14 @@
 fastapi
 uvicorn
+joblib
+scikit-learn
+pydantic
+python-multipart
+SQLAlchemy
+psycopg2-binary
+python-jose[cryptography]
+email-validator
+pandas
+numpy
+shap
+bcrypt
