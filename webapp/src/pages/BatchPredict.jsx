@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import * as api from '../api/adminApi'
+import { FileUp, FileSpreadsheet, ShieldCheck, Zap, Loader2, AlertCircle, CheckCircle2, FileText, ChevronDown } from 'lucide-react'
 
 export default function BatchPredict() {
   const [file, setFile] = useState(null)
@@ -16,7 +17,7 @@ export default function BatchPredict() {
     setResult(null)
     try {
       if (!useSample && !file) {
-        setError('Choose a CSV file or enable “Use server rawtest.csv”.')
+        setError('Please select a valid CSV file or use the server sample.')
         return
       }
       const data = await api.batchPredict(useSample ? null : file, {
@@ -31,7 +32,7 @@ export default function BatchPredict() {
             ? err.response.data
             : JSON.stringify(err.response?.data)) ||
           err.message ||
-          String(err)
+          'Batch processing failed'
       )
     } finally {
       setLoading(false)
@@ -40,7 +41,7 @@ export default function BatchPredict() {
 
   async function runStubUpload() {
     if (!file) {
-      setError('Choose a file for stub upload.')
+      setError('Select a file to upload to the ML stub.')
       return
     }
     setError('')
@@ -57,107 +58,195 @@ export default function BatchPredict() {
   }
 
   return (
-    <div className="page">
-      <h1>Batch CSV predict</h1>
-      <p className="muted">
-        Same as <code>POST /api/v1/admin/batch/predict</code>. Upload a CSV like{' '}
-        <code>dataset/rawtest.csv</code>, or use the server-side sample file.
-      </p>
+    <div>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <h1 style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>Batch Predictions</h1>
+        <p style={{ color: 'var(--text-muted)' }}>Perform high-volume assessments using CSV dataset uploads</p>
+      </div>
 
-      <section className="form">
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={useSample}
-            onChange={(e) => setUseSample(e.target.checked)}
-          />
-          Use server <code>rawtest.csv</code> (no file needed)
-        </label>
-        <label>
-          CSV file
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            disabled={useSample}
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-          />
-        </label>
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={explain}
-            onChange={(e) => setExplain(e.target.checked)}
-          />
-          Include SHAP explainability (slower)
-        </label>
-        <div className="row">
-          <button type="button" onClick={runPredict} disabled={loading}>
-            {loading ? 'Running…' : 'Run batch predict'}
-          </button>
-          <button type="button" onClick={runStubUpload} disabled={loading || !file}>
-            Stub: POST /ml/batch/upload
-          </button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
+        {/* ── Configuration ────────────────────────────────────────── */}
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <FileUp size={20} color="var(--primary)" />
+            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Upload Configuration</h2>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.75rem', 
+              padding: '1rem', 
+              backgroundColor: useSample ? 'var(--primary-glow)' : 'var(--bg-dark)',
+              border: `1px solid ${useSample ? 'var(--primary)' : 'var(--border)'}`,
+              borderRadius: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}>
+              <input
+                type="checkbox"
+                checked={useSample}
+                onChange={(e) => setUseSample(e.target.checked)}
+                style={{ width: '18px', height: '18px' }}
+              />
+              <div>
+                <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>Use Server Sample File</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Uses project-local rawtest.csv (no upload needed)</p>
+              </div>
+            </label>
+          </div>
+
+          <div className="input-group" style={{ opacity: useSample ? 0.5 : 1 }}>
+            <label>Upload CSV File</label>
+            <div style={{ 
+              border: '2px dashed var(--border)', 
+              borderRadius: '12px', 
+              padding: '2rem', 
+              textAlign: 'center',
+              backgroundColor: 'var(--bg-dark)',
+              cursor: useSample ? 'not-allowed' : 'pointer',
+              position: 'relative'
+            }}>
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                disabled={useSample}
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'inherit' }}
+              />
+              <FileSpreadsheet size={32} color={file ? 'var(--primary)' : 'var(--text-dark)'} style={{ marginBottom: '0.75rem' }} />
+              <p style={{ fontSize: '0.9rem', color: file ? 'white' : 'var(--text-muted)' }}>
+                {file ? file.name : 'Click or drop CSV file here'}
+              </p>
+              {file && <p style={{ fontSize: '0.7rem', color: 'var(--accent)', marginTop: '0.5rem' }}>Ready to process</p>}
+            </div>
+          </div>
+
+          <div style={{ margin: '1.5rem 0' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={explain}
+                onChange={(e) => setExplain(e.target.checked)}
+                style={{ width: '18px', height: '18px' }}
+              />
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Include SHAP Explainability (Slower)</span>
+            </label>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <button className="btn btn-primary" onClick={runPredict} disabled={loading} style={{ height: '50px' }}>
+              {loading ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} />}
+              Run Engine
+            </button>
+            <button className="btn btn-outline" onClick={runStubUpload} disabled={loading || !file} style={{ height: '50px' }}>
+              Upload to ML Stub
+            </button>
+          </div>
         </div>
-      </section>
 
-      {error && <p className="error">{error}</p>}
+        {/* ── Help / Instructions ───────────────────────────────────── */}
+        <div className="card" style={{ backgroundColor: 'transparent', borderStyle: 'dashed' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <ShieldCheck size={20} color="var(--accent)" />
+            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Batch Instructions</h2>
+          </div>
+          <ul style={{ color: 'var(--text-muted)', fontSize: '0.9rem', paddingLeft: '1.25rem', lineHeight: '1.8' }}>
+            <li>Ensure CSV file utilizes standard UTF-8 encoding.</li>
+            <li>Required columns: Age, Gender, University, etc.</li>
+            <li>Large batches (&gt;500 rows) may take several seconds.</li>
+            <li>SHAP values provide row-level feature importance.</li>
+          </ul>
+          
+          {error && (
+            <div className="error-container" style={{ marginTop: '1.5rem' }}>
+              <AlertCircle size={18} style={{ marginRight: '8px' }} />
+              {error}
+            </div>
+          )}
 
+          {stubResult && (
+            <div className="card" style={{ marginTop: '1.5rem', backgroundColor: 'var(--bg-dark)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#00e676' }}>
+                <CheckCircle2 size={18} />
+                <span style={{ fontWeight: 600 }}>Stub Uploaded</span>
+              </div>
+              <pre style={{ fontSize: '0.7rem', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
+                {JSON.stringify(stubResult, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Results Table ────────────────────────────────────────── */}
       {result && (
-        <section>
-          <h2>
-            Results ({result.total_rows} rows) — {result.filename}
-          </h2>
-          <div className="table-wrap">
-            <table className="data-table">
+        <div className="card" style={{ marginTop: '2.5rem', padding: 0, overflow: 'hidden' }}>
+          <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <FileText size={20} color="var(--primary)" />
+              <h2 style={{ margin: 0, fontSize: '1.25rem' }}>
+                Engine Results ({result.total_rows} rows)
+              </h2>
+            </div>
+            <span className="badge badge-success">{result.filename || 'Source Cache'}</span>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Anxiety</th>
-                  <th>Stress</th>
-                  <th>Depression</th>
-                  <th>Risk</th>
-                  <th>P(risk)</th>
+                <tr style={{ backgroundColor: 'var(--bg-dark)', borderBottom: '1px solid var(--border)' }}>
+                  <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>#</th>
+                  <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>SCORES (A/S/D)</th>
+                  <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>LABELS</th>
+                  <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>RISK LEVEL</th>
+                  <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>PROBABILITY</th>
                 </tr>
               </thead>
               <tbody>
                 {result.predictions?.map((p) => (
-                  <tr key={p.row_index}>
-                    <td>{p.row_index}</td>
-                    <td>
-                      {p.anxiety_score?.toFixed?.(2) ?? p.anxiety_score}{' '}
-                      <small>({p.anxiety_label})</small>
+                  <tr key={p.row_index} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '1rem 1.5rem', fontWeight: 600 }}>{p.row_index}</td>
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <code style={{ backgroundColor: 'var(--bg-dark)', padding: '4px 8px', borderRadius: '4px' }}>
+                        {p.anxiety_score?.toFixed(1)} / {p.stress_score?.toFixed(1)} / {p.depression_score?.toFixed(1)}
+                      </code>
                     </td>
-                    <td>
-                      {p.stress_score?.toFixed?.(2) ?? p.stress_score}{' '}
-                      <small>({p.stress_label})</small>
+                    <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem' }}>
+                      <span style={{ color: 'var(--primary)' }}>{p.anxiety_label}</span> • 
+                      <span style={{ color: 'var(--accent)' }}> {p.stress_label}</span> • 
+                      <span style={{ color: '#00e676' }}> {p.depression_label}</span>
                     </td>
-                    <td>
-                      {p.depression_score?.toFixed?.(2) ?? p.depression_score}{' '}
-                      <small>({p.depression_label})</small>
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <span className={`badge ${p.risk_level?.toLowerCase()?.includes('high') ? 'badge-danger' : 'badge-warning'}`}>
+                        {p.risk_level}
+                      </span>
                     </td>
-                    <td>{p.risk_level}</td>
-                    <td>
-                      {p.risk_probability != null
-                        ? p.risk_probability.toFixed(4)
-                        : '—'}
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ flex: 1, height: '6px', backgroundColor: 'var(--bg-dark)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: `${(p.risk_probability || 0) * 100}%`, height: '100%', backgroundColor: 'var(--primary)' }}></div>
+                        </div>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                          {((p.risk_probability || 0) * 100).toFixed(1)}%
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <details>
-            <summary>Raw JSON</summary>
-            <pre>{JSON.stringify(result, null, 2)}</pre>
+          <details style={{ padding: '1rem' }}>
+            <summary style={{ fontSize: '0.8rem', color: 'var(--text-dark)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <ChevronDown size={14} /> View Raw JSON Meta
+            </summary>
+            <pre style={{ fontSize: '0.7rem', marginTop: '1rem', backgroundColor: 'var(--bg-dark)', padding: '1rem', borderRadius: '8px' }}>
+              {JSON.stringify(result, null, 2)}
+            </pre>
           </details>
-        </section>
-      )}
-
-      {stubResult && (
-        <section>
-          <h2>Stub upload response</h2>
-          <pre>{JSON.stringify(stubResult, null, 2)}</pre>
-        </section>
+        </div>
       )}
     </div>
   )
