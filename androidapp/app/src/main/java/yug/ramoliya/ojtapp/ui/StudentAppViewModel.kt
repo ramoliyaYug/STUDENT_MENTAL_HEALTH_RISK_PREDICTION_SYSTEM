@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,6 +51,10 @@ class StudentAppViewModel(application: Application) : AndroidViewModel(applicati
     private val _lastSubmit = MutableStateFlow<StudentIndicatorResponse?>(null)
     val lastSubmit: StateFlow<StudentIndicatorResponse?> = _lastSubmit.asStateFlow()
 
+    /** The result selected from history to show in detail. */
+    private val _selectedHistoryItem = MutableStateFlow<StudentIndicatorResponse?>(null)
+    val selectedHistoryItem: StateFlow<StudentIndicatorResponse?> = _selectedHistoryItem.asStateFlow()
+
     val startRoute: String =
         if (repo.getStoredToken().isNullOrBlank()) "login" else "main"
 
@@ -59,6 +64,18 @@ class StudentAppViewModel(application: Application) : AndroidViewModel(applicati
 
     fun showMessage(msg: String) {
         _uiMessage.value = msg
+    }
+
+    fun selectHistoryItem(item: StudentIndicatorResponse) {
+        _selectedHistoryItem.value = item
+    }
+
+    fun clearSelectedHistoryItem() {
+        _selectedHistoryItem.value = null
+    }
+
+    fun clearLastSubmit() {
+        _lastSubmit.value = null
     }
 
     fun login(email: String, password: String, onSuccess: () -> Unit) {
@@ -98,6 +115,7 @@ class StudentAppViewModel(application: Application) : AndroidViewModel(applicati
         _profile.value = null
         _history.value = emptyList()
         _lastSubmit.value = null
+        _selectedHistoryItem.value = null
         onDone()
     }
 
@@ -145,12 +163,38 @@ class StudentAppViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    /** Calls POST /student/indicators (persists the result). */
     fun submitIndicatorsJson(json: String) {
         viewModelScope.launch {
             _busy.value = true
             try {
                 _lastSubmit.value = repo.submitIndicators(json.trim())
                 _uiMessage.value = "Submitted. Risk: ${_lastSubmit.value?.riskLevel}"
+            } catch (e: HttpException) {
+                _uiMessage.value = e.response()?.errorBody()?.string() ?: e.message
+            } catch (e: Exception) {
+                _uiMessage.value = e.message ?: e.toString()
+            } finally {
+                _busy.value = false
+            }
+        }
+    }
+
+    /**
+     * Calls POST /ml/predict (non-persisting) to get score + explanability,
+     * then also persists via /student/indicators.
+     * On success triggers [onSuccess] so UI can navigate to result screen.
+     */
+    fun predictAndSave(indicators: JsonObject, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _busy.value = true
+            try {
+                // First, call ml/predict for full SHAP explainability
+                val result = repo.predict(indicators)
+                _lastSubmit.value = result
+                // Also persist/save
+                repo.submitIndicatorsObject(indicators)
+                onSuccess()
             } catch (e: HttpException) {
                 _uiMessage.value = e.response()?.errorBody()?.string() ?: e.message
             } catch (e: Exception) {

@@ -40,13 +40,20 @@ class StudentRepository(context: Context) {
 
     suspend fun health() = api.health()
 
+    /** POST /student/indicators — persists the result in DB and returns prediction. */
     suspend fun submitIndicators(indicatorsJson: String, modelName: String? = null): StudentIndicatorResponse {
         val obj = JsonParser.parseString(indicatorsJson).asJsonObject
         return api.submitIndicators(StudentIndicatorRequest(indicators = obj, modelName = modelName))
     }
 
+    /** POST /student/indicators — same but accepts a JsonObject directly. */
     suspend fun submitIndicatorsObject(indicators: JsonObject, modelName: String? = null): StudentIndicatorResponse {
         return api.submitIndicators(StudentIndicatorRequest(indicators = indicators, modelName = modelName))
+    }
+
+    /** POST /ml/predict — direct prediction with SHAP explainability, does NOT persist. */
+    suspend fun predict(indicators: JsonObject, modelName: String? = null): StudentIndicatorResponse {
+        return api.predict(StudentIndicatorRequest(indicators = indicators, modelName = modelName))
     }
 
     suspend fun history(range: String = "weekly"): List<StudentIndicatorResponse> = api.getHistory(range)

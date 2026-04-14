@@ -34,8 +34,13 @@ interface StudentApiService {
     @GET("health")
     suspend fun health(): HealthResponse
 
+    /** Submit indicators and persist them (saves to DB). */
     @POST("student/indicators")
     suspend fun submitIndicators(@Body body: StudentIndicatorRequest): StudentIndicatorResponse
+
+    /** Run direct ML prediction (does NOT persist). */
+    @POST("ml/predict")
+    suspend fun predict(@Body body: StudentIndicatorRequest): StudentIndicatorResponse
 
     @GET("student/history")
     suspend fun getHistory(@Query("range") range: String = "weekly"): List<StudentIndicatorResponse>

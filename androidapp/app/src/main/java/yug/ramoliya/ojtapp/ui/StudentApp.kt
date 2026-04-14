@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import yug.ramoliya.ojtapp.ui.screens.AssessmentScreen
 import yug.ramoliya.ojtapp.ui.screens.LoginScreen
 import yug.ramoliya.ojtapp.ui.screens.MainShellScreen
 import yug.ramoliya.ojtapp.ui.screens.RegisterScreen
+import yug.ramoliya.ojtapp.ui.screens.ResultDetailScreen
 
 @Composable
 fun StudentApp(vm: StudentAppViewModel) {
@@ -66,7 +68,48 @@ fun StudentApp(vm: StudentAppViewModel) {
                         popUpTo("main") { inclusive = true }
                     }
                 },
+                onStartAssessment = { nav.navigate("assessment") },
+                onHistoryItemSelected = { nav.navigate("history_detail") },
             )
+        }
+        composable("assessment") {
+            AssessmentScreen(
+                vm = vm,
+                onBack = { nav.popBackStack() },
+                onResult = {
+                    nav.navigate("result") {
+                        popUpTo("assessment") { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable("result") {
+            val result by vm.lastSubmit.collectAsState()
+            result?.let { res ->
+                ResultDetailScreen(
+                    result = res,
+                    title = "Your Results",
+                    onBack = {
+                        vm.clearLastSubmit()
+                        nav.navigate("main") {
+                            popUpTo("main") { inclusive = false }
+                        }
+                    },
+                )
+            }
+        }
+        composable("history_detail") {
+            val result by vm.selectedHistoryItem.collectAsState()
+            result?.let { res ->
+                ResultDetailScreen(
+                    result = res,
+                    title = "Assessment Detail",
+                    onBack = {
+                        vm.clearSelectedHistoryItem()
+                        nav.popBackStack()
+                    },
+                )
+            }
         }
     }
 }

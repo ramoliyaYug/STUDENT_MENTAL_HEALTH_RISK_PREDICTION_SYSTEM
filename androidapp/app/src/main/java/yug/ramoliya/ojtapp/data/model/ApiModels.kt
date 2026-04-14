@@ -44,6 +44,13 @@ data class StudentIndicatorResponse(
     @SerializedName("anxiety_label") val anxietyLabel: String? = null,
     @SerializedName("stress_label") val stressLabel: String? = null,
     @SerializedName("depression_label") val depressionLabel: String? = null,
+    val explainability: List<ShapValue>? = null,
     @SerializedName("model_used") val modelUsed: String,
     @SerializedName("created_at") val createdAt: String,
+)
+
+data class ShapValue(
+    val feature: String,
+    @SerializedName("shap_value") val shapValue: Double,
+    @SerializedName("abs_shap_value") val absShapValue: Double,
 )
