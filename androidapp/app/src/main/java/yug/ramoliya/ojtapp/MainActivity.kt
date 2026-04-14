@@ -1,16 +1,14 @@
 package yug.ramoliya.ojtapp
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import yug.ramoliya.ojtapp.ui.StudentApp
+import yug.ramoliya.ojtapp.ui.StudentAppViewModel
 import yug.ramoliya.ojtapp.ui.theme.OjtappTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,30 +16,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val app = LocalContext.current.applicationContext as Application
+            val vm: StudentAppViewModel = viewModel(factory = StudentAppViewModel.factory(app))
             OjtappTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                StudentApp(vm)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    OjtappTheme {
-        Greeting("Android")
     }
 }
