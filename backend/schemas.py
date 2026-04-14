@@ -86,3 +86,22 @@ class ExplainabilityResponse(BaseModel):
     class_probabilities: Dict[str, float]
     top_features: List[Dict[str, Any]]
 
+
+class AdminBatchPredictionRow(BaseModel):
+    row_index: int
+    anxiety_score: float
+    stress_score: float
+    depression_score: float
+    anxiety_label: str
+    stress_label: str
+    depression_label: str
+    risk_level: str
+    risk_probability: Optional[float] = None
+    explainability: Optional[List[Dict[str, Any]]] = None
+
+
+class AdminBatchPredictResponse(BaseModel):
+    filename: str
+    total_rows: int
+    predictions: List[AdminBatchPredictionRow]
+

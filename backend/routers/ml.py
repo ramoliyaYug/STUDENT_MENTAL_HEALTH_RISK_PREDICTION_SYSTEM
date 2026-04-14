@@ -19,6 +19,26 @@ MODELS_DIR = BASE_DIR / "models"
 PROJECT_DIR = BASE_DIR.parent
 RAW_DATA_PATH = PROJECT_DIR / "dataset" / "Raw Data.csv"
 CLEAN_DATA_PATH = PROJECT_DIR / "dataset" / "cleaned_data_with_risk.csv"
+RAW_TEST_PATH = PROJECT_DIR / "dataset" / "rawtest.csv"
+
+# Columns to ignore if present (raw CSV like Raw Data.csv / rawtest.csv)
+RAW_CSV_DROP_COLUMNS = {
+    "Anxiety Value",
+    "Anxiety Label",
+    "Stress Value",
+    "Stress Label",
+    "Depression Value",
+    "Depression Label",
+}
+CLEAN_CSV_DROP_COLUMNS = {
+    "Anxiety_Score",
+    "Stress_Score",
+    "Depression_Score",
+    "Anxiety_Label",
+    "Stress_Label",
+    "Depression_Label",
+    "Risk_Level",
+}
 
 router = APIRouter()
 
@@ -122,58 +142,126 @@ def load_feature_map_and_encoders() -> None:
     _DEPARTMENT_ENCODER.fit(clean_df["Department"])
 
 
-def _normalize_and_encode_input(indicators: Dict[str, Any]) -> pd.DataFrame:
+def normalize_batch_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     if not FEATURE_COLS:
         raise HTTPException(status_code=500, detail="Feature configuration is not loaded.")
 
-    normalized: Dict[str, Any] = {}
-    for key, value in indicators.items():
-        clean_key = RAW_TO_CLEAN_FEATURE_MAP.get(key, key)
-        normalized[clean_key] = value
+    out = df.copy()
+    for col in list(out.columns):
+        if col in RAW_CSV_DROP_COLUMNS or col in CLEAN_CSV_DROP_COLUMNS:
+            out = out.drop(columns=[col])
 
-    missing = [col for col in FEATURE_COLS if col not in normalized]
+    rename_map = {k: v for k, v in RAW_TO_CLEAN_FEATURE_MAP.items() if k in out.columns}
+    if rename_map:
+        out = out.rename(columns=rename_map)
+
+    missing = [col for col in FEATURE_COLS if col not in out.columns]
     if missing:
         raise HTTPException(
             status_code=422,
-            detail=f"Missing required indicators ({len(missing)}): {missing}",
+            detail=f"Missing required columns ({len(missing)}): {missing}. "
+            "CSV must match dataset/rawtest.csv or Raw Data.csv feature columns.",
         )
 
-    df = pd.DataFrame([[normalized[col] for col in FEATURE_COLS]], columns=FEATURE_COLS)
+    out = out[FEATURE_COLS].copy()
 
-    # Match notebook preprocessing.
+    question_cols = [
+        c
+        for c in FEATURE_COLS
+        if c not in ORDINAL_FEATURES and c not in ("Gender", "Scholarship", "University", "Department")
+    ]
+    for col in question_cols:
+        out[col] = pd.to_numeric(out[col], errors="coerce")
+    if out[question_cols].isna().any().any():
+        bad = out[question_cols].isna().stack()
+        bad_idx = bad[bad].index.tolist()[:20]
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid or non-numeric questionnaire value(s) in CSV (first issues): {bad_idx}",
+        )
+
     assert _ORDINAL_ENCODER is not None
     assert _UNIVERSITY_ENCODER is not None
     assert _DEPARTMENT_ENCODER is not None
 
     try:
-        df[ORDINAL_FEATURES] = _ORDINAL_ENCODER.transform(df[ORDINAL_FEATURES])
+        out[ORDINAL_FEATURES] = _ORDINAL_ENCODER.transform(out[ORDINAL_FEATURES])
     except Exception as exc:
-        raise HTTPException(status_code=422, detail=f"Invalid ordinal indicator value: {exc}")
+        raise HTTPException(status_code=422, detail=f"Invalid ordinal field value: {exc}")
 
     for col, mapping in BINARY_FEATURE_MAP.items():
-        df[col] = df[col].map(mapping)
-        if df[col].isna().any():
+        out[col] = out[col].map(mapping)
+        if out[col].isna().any():
             raise HTTPException(
                 status_code=422,
                 detail=f"Invalid value for '{col}'. Allowed: {list(mapping.keys())}",
             )
 
     try:
-        df["University"] = _UNIVERSITY_ENCODER.transform(df["University"])
-        df["Department"] = _DEPARTMENT_ENCODER.transform(df["Department"])
+        out["University"] = _UNIVERSITY_ENCODER.transform(out["University"])
+        out["Department"] = _DEPARTMENT_ENCODER.transform(out["Department"])
     except Exception as exc:
         raise HTTPException(status_code=422, detail=f"Unknown University/Department value: {exc}")
 
-    return df
+    return out
 
 
-def _predict_with_model(model_name: str, X: pd.DataFrame) -> Tuple[Any, Optional[np.ndarray]]:
+def _normalize_and_encode_input(indicators: Dict[str, Any]) -> pd.DataFrame:
+    return normalize_batch_dataframe(pd.DataFrame([indicators]))
+
+
+def _predict_model_array(model_name: str, X: pd.DataFrame) -> Tuple[np.ndarray, Optional[np.ndarray]]:
     if model_name not in _MODEL_REGISTRY:
         raise HTTPException(status_code=500, detail=f"Required model '{model_name}' not found.")
     model = _MODEL_REGISTRY[model_name]["model"]
-    pred = model.predict(X)[0]
-    proba = model.predict_proba(X)[0] if hasattr(model, "predict_proba") else None
-    return pred, proba
+    preds = model.predict(X)
+    proba = model.predict_proba(X) if hasattr(model, "predict_proba") else None
+    return preds, proba
+
+
+def _predict_with_model(model_name: str, X: pd.DataFrame) -> Tuple[Any, Optional[np.ndarray]]:
+    preds, proba = _predict_model_array(model_name, X)
+    p0 = preds[0] if getattr(preds, "shape", ()) != () else preds
+    pr0 = proba[0] if proba is not None else None
+    return p0, pr0
+
+
+def run_batch_predictions(X: pd.DataFrame, include_explainability: bool = False) -> List[Dict[str, Any]]:
+    if not _MODEL_REGISTRY:
+        raise HTTPException(status_code=500, detail="No models loaded on the server.")
+
+    anxiety_s, _ = _predict_model_array(MODEL_NAMES["anxiety_score"], X)
+    stress_s, _ = _predict_model_array(MODEL_NAMES["stress_score"], X)
+    depression_s, _ = _predict_model_array(MODEL_NAMES["depression_score"], X)
+    anxiety_l, _ = _predict_model_array(MODEL_NAMES["anxiety_label"], X)
+    stress_l, _ = _predict_model_array(MODEL_NAMES["stress_label"], X)
+    depression_l, _ = _predict_model_array(MODEL_NAMES["depression_label"], X)
+    risk_level, risk_proba = _predict_model_array(MODEL_NAMES["risk_level"], X)
+
+    risk_prob_per_row: Optional[np.ndarray] = None
+    if risk_proba is not None:
+        risk_prob_per_row = np.max(risk_proba, axis=1)
+
+    n = len(X)
+    rows: List[Dict[str, Any]] = []
+    for i in range(n):
+        rk = str(risk_level[i])
+        ex = _explain_risk(X.iloc[[i]], rk) if include_explainability else None
+        rows.append(
+            {
+                "row_index": i,
+                "anxiety_score": float(anxiety_s[i]),
+                "stress_score": float(stress_s[i]),
+                "depression_score": float(depression_s[i]),
+                "anxiety_label": str(anxiety_l[i]),
+                "stress_label": str(stress_l[i]),
+                "depression_label": str(depression_l[i]),
+                "risk_level": rk,
+                "risk_probability": float(risk_prob_per_row[i]) if risk_prob_per_row is not None else None,
+                "explainability": ex,
+            }
+        )
+    return rows
 
 
 def _explain_risk(X: pd.DataFrame, predicted_risk: str) -> List[Dict[str, Any]]:

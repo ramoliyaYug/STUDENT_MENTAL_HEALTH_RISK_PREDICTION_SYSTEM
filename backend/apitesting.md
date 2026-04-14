@@ -22,13 +22,14 @@ http://127.0.0.1:8000/api/v1
 ## 2) Test order (recommended)
 
 1. Health check
-2. Register student
-3. Login student
+2. Register student (or admin with `"role": "admin"`)
+3. Login
 4. Get profile (`/auth/me`)
 5. Check model info + indicators
-6. Submit indicators (`/student/indicators`)
+6. Submit indicators (`/student/indicators`) — student token
 7. Check student history
-8. Login admin and test admin/analytics endpoints
+8. Login as admin and run **batch CSV predict** (`/admin/batch/predict`) — optional: `use_project_rawtest=true` uses `dataset/rawtest.csv`
+9. Other admin + analytics endpoints
 
 ---
 
@@ -48,6 +49,8 @@ http://127.0.0.1:8000/api/v1
   "role": "student"
 }
 ```
+
+For an admin account, use `"role": "admin"` (same endpoint).
 
 Response contains:
 - `access_token`
@@ -231,11 +234,33 @@ Then login and save token as `ADMIN_TOKEN`.
 - Headers:
   - `Authorization: Bearer <ADMIN_TOKEN>`
 
+### 7.6 Batch CSV predict (all rows scored in response)
+
+- Method: `POST`
+- URL: `/admin/batch/predict`
+- Headers:
+  - `Authorization: Bearer <ADMIN_TOKEN>`
+- Body type: `multipart/form-data`
+- Fields:
+  - `file` (optional): CSV file with the **same columns as** `dataset/rawtest.csv` (Raw Data format). Target columns such as Anxiety Value / Stress Value / Depression Value / labels are ignored if present; models compute predictions.
+  - `use_project_rawtest` (optional, boolean): if `true`, the server reads **`dataset/rawtest.csv`** from the repo instead of an uploaded file (easy smoke test).
+  - `include_explainability` (optional, boolean): if `true`, each row includes SHAP top features for risk (slower for large files).
+
+**Response shape**
+
+- `filename`: string
+- `total_rows`: number of data rows scored
+- `predictions`: array of objects, one per CSV row (0-based `row_index`):
+  - `anxiety_score`, `stress_score`, `depression_score`
+  - `anxiety_label`, `stress_label`, `depression_label`
+  - `risk_level`, `risk_probability`
+  - `explainability` (only if `include_explainability=true`)
+
 ---
 
-## 8) Batch API
+## 8) Other batch / upload APIs
 
-### 8.1 Upload CSV
+### 8.1 Upload CSV (job stub only)
 
 - Method: `POST`
 - URL: `/ml/batch/upload`
@@ -279,7 +304,7 @@ Then login and save token as `ADMIN_TOKEN`.
 ```bash
 curl -X POST "http://127.0.0.1:8000/api/v1/auth/register" \
   -H "Content-Type: application/json" \
-  -d '{"name":"Alice Johnson","email":"alice@example.com","password":"StrongPass123!"}'
+  -d '{"name":"Alice Johnson","email":"alice@example.com","password":"StrongPass123!","role":"student"}'
 ```
 
 ### Login
@@ -341,6 +366,28 @@ curl -X POST "http://127.0.0.1:8000/api/v1/ml/predict" \
   }'
 ```
 
+### Batch predict using bundled `rawtest.csv` (no file upload)
+
+From project root (so the path to `rawtest.csv` exists on disk next to `backend/`):
+
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/admin/batch/predict" \
+  -H "Authorization: Bearer <ADMIN_TOKEN>" \
+  -F "use_project_rawtest=true" \
+  -F "include_explainability=false"
+```
+
+### Batch predict by uploading a CSV
+
+Use the same format as `dataset/rawtest.csv` (or `dataset/Raw Data.csv`):
+
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/admin/batch/predict" \
+  -H "Authorization: Bearer <ADMIN_TOKEN>" \
+  -F "file=@/home/mastermind/Desktop/extras/STUDENT_MENTAL_HEALTH_RISK_PREDICTION_SYSTEM/dataset/rawtest.csv" \
+  -F "include_explainability=false"
+```
+
 ---
 
 ## 11) Common issues
@@ -351,3 +398,5 @@ curl -X POST "http://127.0.0.1:8000/api/v1/ml/predict" \
   - Ensure model files are in `backend/models` with `.pkl` extension.
 - `Missing required indicators`:
   - Call `GET /api/v1/ml/indicators` and send all listed cleaned feature columns.
+- `dataset/rawtest.csv not found` when using `use_project_rawtest=true`:
+  - Run the API from the machine that has the repo checked out, or upload the file with `file=@...` instead.
