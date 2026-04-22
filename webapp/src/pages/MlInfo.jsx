@@ -68,7 +68,7 @@ export default function MlInfo() {
               </div>
               <div style={{ padding: '1rem', backgroundColor: 'var(--bg-dark)', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Status</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#00e676' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--success)' }}>
                   <CheckCircle2 size={14} />
                   <span>Production Ready</span>
                 </div>

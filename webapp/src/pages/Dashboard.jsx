@@ -53,7 +53,7 @@ export default function Dashboard() {
     { 
       label: 'System Status', 
       value: health?.status === 'ok' ? 'Healthy' : 'Issues', 
-      icon: health?.status === 'ok' ? <CheckCircle2 size={24} color="#00e676" /> : <AlertTriangle size={24} color="#ff8a80" />,
+      icon: health?.status === 'ok' ? <CheckCircle2 size={24} color="var(--success)" /> : <AlertTriangle size={24} color="var(--danger)" />,
       subtitle: health?.db === 'connected' ? 'DB Connected' : 'DB Link Error'
     }
   ]
@@ -113,7 +113,7 @@ export default function Dashboard() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>API Status</span>
-              <span style={{ color: '#00e676' }}>Active</span>
+              <span style={{ color: 'var(--success)' }}>Active</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--text-muted)' }}>Version</span>
@@ -123,7 +123,7 @@ export default function Dashboard() {
         </div>
 
         {/* ── Deployment Card ───────────────────────────────────── */}
-        <div className="card" style={{ background: 'linear-gradient(45deg, var(--bg-card), #1e1e40)' }}>
+        <div className="card" style={{ background: 'linear-gradient(45deg, var(--bg-card), var(--bg-card-hover))' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
             <Globe size={20} color="var(--accent)" />
             <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Network</h2>

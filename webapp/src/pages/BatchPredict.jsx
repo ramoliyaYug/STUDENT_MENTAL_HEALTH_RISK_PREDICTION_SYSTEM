@@ -165,7 +165,7 @@ export default function BatchPredict() {
                 style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'inherit' }}
               />
               <FileSpreadsheet size={32} color={file ? 'var(--primary)' : 'var(--text-dark)'} style={{ marginBottom: '0.75rem' }} />
-              <p style={{ fontSize: '0.9rem', color: file ? 'white' : 'var(--text-muted)' }}>
+              <p style={{ fontSize: '0.9rem', color: file ? 'var(--text-main)' : 'var(--text-muted)' }}>
                 {file ? file.name : 'Click or drop CSV file here'}
               </p>
               {file && <p style={{ fontSize: '0.7rem', color: 'var(--accent)', marginTop: '0.5rem' }}>Ready to process</p>}
@@ -217,7 +217,7 @@ export default function BatchPredict() {
 
           {stubResult && (
             <div className="card" style={{ marginTop: '1.5rem', backgroundColor: 'var(--bg-dark)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#00e676' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--success)' }}>
                 <CheckCircle2 size={18} />
                 <span style={{ fontWeight: 600 }}>Stub Uploaded</span>
               </div>
@@ -271,7 +271,7 @@ export default function BatchPredict() {
                     <td style={{ padding: '1rem 1.5rem', fontSize: '0.85rem' }}>
                       <span style={{ color: 'var(--primary)' }}>{p.anxiety_label}</span> • 
                       <span style={{ color: 'var(--accent)' }}> {p.stress_label}</span> • 
-                      <span style={{ color: '#00e676' }}> {p.depression_label}</span>
+                      <span style={{ color: 'var(--success)' }}> {p.depression_label}</span>
                     </td>
                     <td style={{ padding: '1rem 1.5rem' }}>
                       <span className={`badge ${p.risk_level?.toLowerCase()?.includes('high') ? 'badge-danger' : 'badge-warning'}`}>

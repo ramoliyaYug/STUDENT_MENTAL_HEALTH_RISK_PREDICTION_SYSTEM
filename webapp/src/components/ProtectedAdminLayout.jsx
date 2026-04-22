@@ -71,7 +71,8 @@ export default function ProtectedAdminLayout() {
         top: 0,
         bottom: 0,
         left: 0,
-        zIndex: 100
+        zIndex: 100,
+        boxShadow: 'var(--shadow-md)'
       }}>
         <div style={{ padding: '2rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
@@ -109,6 +110,7 @@ export default function ProtectedAdminLayout() {
             marginBottom: '1rem',
             padding: '0.75rem',
             backgroundColor: 'var(--bg-dark)',
+            border: '1px solid var(--border)',
             borderRadius: '12px'
           }}>
             <div style={{
@@ -157,15 +159,16 @@ export default function ProtectedAdminLayout() {
           color: var(--text-muted);
           border-radius: 12px;
           margin-bottom: 0.5rem;
-          font-weight: 500;
+          font-weight: 700;
+          font-family: "Comic Relief", system-ui, sans-serif;
           transition: all 0.2s ease;
         }
         .nav-link:hover {
-          color: white;
-          background-color: var(--bg-dark);
+          color: var(--primary);
+          background-color: var(--primary-glow);
         }
         .nav-link.active {
-          color: white;
+          color: #ffffff;
           background-color: var(--primary);
           box-shadow: 0 4px 12px var(--primary-glow);
         }

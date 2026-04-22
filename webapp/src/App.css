@@ -47,7 +47,8 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700;
+  font-family: "Comic Relief", system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease;
   border: none;
   font-size: 0.95rem;
@@ -55,7 +56,7 @@
 
 .btn-primary {
   background-color: var(--primary);
-  color: white;
+  color: #ffffff;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -71,13 +72,14 @@
 
 .btn-outline {
   background-color: transparent;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   color: var(--text-main);
 }
 
 .btn-outline:hover {
   border-color: var(--primary);
   background-color: var(--primary-glow);
+  color: var(--primary);
 }
 
 .input-group {
@@ -90,7 +92,7 @@
 .input-group label {
   font-size: 0.85rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 input[type="text"],
@@ -100,11 +102,12 @@ input[type="number"],
 select,
 textarea {
   background-color: var(--bg-dark);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   color: var(--text-main);
   font-size: 1rem;
+  font-family: "Comic Relief", system-ui, -apple-system, sans-serif;
   width: 100%;
   transition: all 0.2s ease;
 }
@@ -117,6 +120,12 @@ textarea:focus {
   box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
+/* Ensure placeholder text is readable on light background */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-dark);
+}
+
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
@@ -125,15 +134,15 @@ textarea:focus {
   text-transform: uppercase;
 }
 
-.badge-success { background-color: rgba(0, 200, 83, 0.15); color: #00e676; }
-.badge-warning { background-color: rgba(255, 167, 38, 0.15); color: #ffb74d; }
-.badge-danger { background-color: rgba(239, 83, 80, 0.15); color: #ff8a80; }
+.badge-success { background-color: rgba(56, 161, 105, 0.12); color: #276749; }
+.badge-warning { background-color: rgba(214, 158, 46, 0.12); color: #744210; }
+.badge-danger  { background-color: rgba(229, 62, 62, 0.12);  color: #9b2c2c; }
 
 /* ── Typography ─────────────────────────────── */
 
 h1, h2, h3 {
-  font-weight: 800;
-  color: white;
+  font-weight: 700;
+  color: var(--text-main);
   margin-bottom: 1rem;
 }
 
@@ -145,16 +154,16 @@ h1, h2, h3 {
 }
 
 .error-container {
-  background-color: rgba(239, 83, 80, 0.1);
-  border: 1px solid rgba(239, 83, 80, 0.2);
-  color: #ff8a80;
+  background-color: rgba(229, 62, 62, 0.08);
+  border: 1px solid rgba(229, 62, 62, 0.25);
+  color: var(--danger);
   padding: 1rem;
   border-radius: var(--radius-md);
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 }
 
-/* ── Specific Auth Blobs ────────────────────── */
+/* ── Auth Blobs ────────────────────────────── */
 
 .auth-blob {
   position: absolute;
@@ -163,7 +172,7 @@ h1, h2, h3 {
   border-radius: 50%;
   filter: blur(80px);
   z-index: 0;
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
 .auth-blob-1 {

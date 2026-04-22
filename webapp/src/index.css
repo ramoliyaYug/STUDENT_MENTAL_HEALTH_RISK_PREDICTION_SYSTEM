@@ -1,25 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* ── Font ────────────────────────────────────── */
+/* Comic Relief loaded via index.html <link> tags */
 
 :root {
-  --bg-dark: #0f0f1a;
-  --bg-card: #1a1a2e;
-  --bg-card-hover: #23233e;
+  /* Light theme backgrounds */
+  --bg-dark: #f0f4ff;           /* page background (soft lavender-white) */
+  --bg-card: #ffffff;           /* card background */
+  --bg-card-hover: #f5f7ff;     /* card background on hover */
+
+  /* Brand colours – kept from original for continuity */
   --primary: #6c63ff;
-  --primary-glow: rgba(108, 99, 255, 0.2);
-  --accent: #48cae4;
-  --accent-glow: rgba(72, 202, 228, 0.2);
-  --text-main: #ffffff;
-  --text-muted: #b0bec5;
-  --text-dark: #607d8b;
-  --border: #2a2a3e;
-  --danger: #ef5350;
-  --success: #00c853;
-  --warning: #ffa726;
-  
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
-  
+  --primary-glow: rgba(108, 99, 255, 0.15);
+  --accent: #0097b2;
+  --accent-glow: rgba(0, 151, 178, 0.15);
+
+  /* Text */
+  --text-main: #1a1a2e;         /* near-black for headings / body */
+  --text-muted: #4a5568;        /* secondary text */
+  --text-dark: #718096;         /* de-emphasised labels */
+
+  /* Borders */
+  --border: #d6dcf5;
+
+  /* Semantic */
+  --danger: #e53e3e;
+  --success: #38a169;
+  --warning: #d69e2e;
+
+  /* Shadows (lighter for light theme) */
+  --shadow-sm: 0 2px 4px rgba(108, 99, 255, 0.06);
+  --shadow-md: 0 4px 16px rgba(108, 99, 255, 0.10);
+  --shadow-lg: 0 8px 32px rgba(108, 99, 255, 0.14);
+
+  /* Radii unchanged */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -33,10 +45,11 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: "Comic Relief", system-ui, -apple-system, sans-serif;
+  font-weight: 400;
   background-color: var(--bg-dark);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -53,7 +66,7 @@ a:hover {
 
 button {
   cursor: pointer;
-  font-family: inherit;
+  font-family: "Comic Relief", system-ui, -apple-system, sans-serif;
 }
 
 /* Scrollbar Styling */
