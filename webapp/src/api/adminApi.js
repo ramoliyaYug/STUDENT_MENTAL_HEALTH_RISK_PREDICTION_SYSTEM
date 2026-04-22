@@ -10,6 +10,11 @@ export async function getDashboard() {
   return data
 }
 
+export async function getAdminStats() {
+  const { data } = await http.get('/admin/stats')
+  return data
+}
+
 export async function listStudents(params = {}) {
   const { data } = await http.get('/admin/students', { params })
   return data

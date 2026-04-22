@@ -6,6 +6,7 @@ import { Activity, Users, AlertTriangle, CheckCircle2, Server, Globe } from 'luc
 export default function Dashboard() {
   const [health, setHealth] = useState(null)
   const [dash, setDash] = useState(null)
+  const [statsData, setStatsData] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -13,10 +14,15 @@ export default function Dashboard() {
     let cancelled = false
     ;(async () => {
       try {
-        const [h, d] = await Promise.all([api.getHealth(), api.getDashboard()])
+        const [h, d, s] = await Promise.all([
+          api.getHealth(),
+          api.getDashboard(),
+          api.getAdminStats(),
+        ])
         if (!cancelled) {
           setHealth(h)
           setDash(d)
+          setStatsData(s)
         }
       } catch (err) {
         if (!cancelled) {
@@ -34,13 +40,13 @@ export default function Dashboard() {
   const stats = [
     { 
       label: 'Total Students', 
-      value: dash?.student_count || 0, 
+      value: statsData?.total_students ?? dash?.total_students ?? 0, 
       icon: <Users size={24} color="var(--primary)" />,
       subtitle: 'Registered in system'
     },
     { 
-      label: 'Assessment Data', 
-      value: dash?.indicator_count || 0, 
+      label: 'Total Assessments', 
+      value: statsData?.total_assessments ?? dash?.total_assessments ?? 0, 
       icon: <Activity size={24} color="var(--accent)" />,
       subtitle: 'Total records collected'
     },

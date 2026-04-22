@@ -87,6 +87,7 @@ def dashboard(
     admin_user: models.User = Depends(auth.require_role("admin")),
 ) -> Dict[str, Any]:
     total_students = db.query(models.User).filter(models.User.role == "student").count()
+    total_assessments = db.query(models.StudentIndicatorEntry).count()
     by_risk = (
         db.query(models.StudentIndicatorEntry.risk_level, models.StudentIndicatorEntry.id)
         .all()
@@ -96,7 +97,24 @@ def dashboard(
         if risk_level not in dist:
             dist[risk_level] = 0
         dist[risk_level] += 1
-    return {"total_students": total_students, "risk_distribution": dist}
+    return {
+        "total_students": total_students,
+        "total_assessments": total_assessments,
+        "risk_distribution": dist,
+    }
+
+
+@router.get("/stats")
+def admin_stats(
+    db: Session = Depends(get_db),
+    admin_user: models.User = Depends(auth.require_role("admin")),
+) -> Dict[str, int]:
+    total_students = db.query(models.User).filter(models.User.role == "student").count()
+    total_assessments = db.query(models.StudentIndicatorEntry).count()
+    return {
+        "total_students": total_students,
+        "total_assessments": total_assessments,
+    }
 
 
 @router.get("/batch/{batch_id}")

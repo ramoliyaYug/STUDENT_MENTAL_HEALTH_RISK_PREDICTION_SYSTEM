@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import * as api from '../api/adminApi'
-import { FileUp, FileSpreadsheet, ShieldCheck, Zap, Loader2, AlertCircle, CheckCircle2, FileText, ChevronDown } from 'lucide-react'
+import { FileUp, FileSpreadsheet, ShieldCheck, Zap, Loader2, AlertCircle, CheckCircle2, FileText, ChevronDown, Download } from 'lucide-react'
 
 export default function BatchPredict() {
   const [file, setFile] = useState(null)
@@ -10,6 +10,55 @@ export default function BatchPredict() {
   const [stubResult, setStubResult] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  function escapeCsvCell(value) {
+    if (value === null || value === undefined) return ''
+    const stringValue = String(value)
+    if (stringValue.includes('"') || stringValue.includes(',') || stringValue.includes('\n')) {
+      return `"${stringValue.replace(/"/g, '""')}"`
+    }
+    return stringValue
+  }
+
+  function exportResultsCsv() {
+    if (!result?.predictions?.length) return
+
+    const headers = [
+      'row_index',
+      'anxiety_score',
+      'stress_score',
+      'depression_score',
+      'anxiety_label',
+      'stress_label',
+      'depression_label',
+      'risk_level',
+      'risk_probability',
+    ]
+
+    const rows = result.predictions.map((p) => [
+      p.row_index,
+      p.anxiety_score,
+      p.stress_score,
+      p.depression_score,
+      p.anxiety_label,
+      p.stress_label,
+      p.depression_label,
+      p.risk_level,
+      p.risk_probability,
+    ])
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsvCell).join(','))
+      .join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = `batch_predictions_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
 
   async function runPredict() {
     setError('')
@@ -190,7 +239,13 @@ export default function BatchPredict() {
                 Engine Results ({result.total_rows} rows)
               </h2>
             </div>
-            <span className="badge badge-success">{result.filename || 'Source Cache'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span className="badge badge-success">{result.filename || 'Source Cache'}</span>
+              <button className="btn btn-outline" onClick={exportResultsCsv}>
+                <Download size={16} />
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div style={{ overflowX: 'auto' }}>
