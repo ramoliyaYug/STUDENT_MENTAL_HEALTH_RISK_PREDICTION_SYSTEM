@@ -57,6 +57,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import yug.ramoliya.ojtapp.data.model.StudentIndicatorResponse
 import yug.ramoliya.ojtapp.ui.StudentAppViewModel
+import yug.ramoliya.ojtapp.ui.theme.BrandPurple
+import yug.ramoliya.ojtapp.ui.theme.BrandTeal
+import yug.ramoliya.ojtapp.ui.theme.LightBackground
+import yug.ramoliya.ojtapp.ui.theme.LightSurface
+import yug.ramoliya.ojtapp.ui.theme.LightTextDim
+import yug.ramoliya.ojtapp.ui.theme.LightTextMain
+import yug.ramoliya.ojtapp.ui.theme.LightTextMuted
 
 @Composable
 fun MainShellScreen(
@@ -68,20 +75,20 @@ fun MainShellScreen(
     var tab by remember { mutableIntStateOf(0) }
 
     Scaffold(
-        containerColor = Color(0xFF0F0F1A),
+        containerColor = LightBackground,
         bottomBar = {
-            NavigationBar(containerColor = Color(0xFF1A1A2E)) {
+            NavigationBar(containerColor = LightSurface) {
                 NavigationBarItem(
                     selected = tab == 0,
                     onClick = { tab = 0 },
                     icon = { Icon(Icons.Default.Person, contentDescription = null) },
                     label = { Text("Profile") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF6C63FF),
-                        selectedTextColor = Color(0xFF6C63FF),
-                        unselectedIconColor = Color.Gray,
-                        unselectedTextColor = Color.Gray,
-                        indicatorColor = Color(0xFF6C63FF).copy(alpha = 0.15f),
+                        selectedIconColor   = BrandPurple,
+                        selectedTextColor   = BrandPurple,
+                        unselectedIconColor = LightTextMuted,
+                        unselectedTextColor = LightTextMuted,
+                        indicatorColor      = BrandPurple.copy(alpha = 0.12f),
                     ),
                 )
                 NavigationBarItem(
@@ -90,11 +97,11 @@ fun MainShellScreen(
                     icon = { Icon(Icons.AutoMirrored.Outlined.Assignment, contentDescription = null) },
                     label = { Text("Assess") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF6C63FF),
-                        selectedTextColor = Color(0xFF6C63FF),
-                        unselectedIconColor = Color.Gray,
-                        unselectedTextColor = Color.Gray,
-                        indicatorColor = Color(0xFF6C63FF).copy(alpha = 0.15f),
+                        selectedIconColor   = BrandPurple,
+                        selectedTextColor   = BrandPurple,
+                        unselectedIconColor = LightTextMuted,
+                        unselectedTextColor = LightTextMuted,
+                        indicatorColor      = BrandPurple.copy(alpha = 0.12f),
                     ),
                 )
                 NavigationBarItem(
@@ -103,11 +110,11 @@ fun MainShellScreen(
                     icon = { Icon(Icons.Default.History, contentDescription = null) },
                     label = { Text("History") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF6C63FF),
-                        selectedTextColor = Color(0xFF6C63FF),
-                        unselectedIconColor = Color.Gray,
-                        unselectedTextColor = Color.Gray,
-                        indicatorColor = Color(0xFF6C63FF).copy(alpha = 0.15f),
+                        selectedIconColor   = BrandPurple,
+                        selectedTextColor   = BrandPurple,
+                        unselectedIconColor = LightTextMuted,
+                        unselectedTextColor = LightTextMuted,
+                        indicatorColor      = BrandPurple.copy(alpha = 0.12f),
                     ),
                 )
             }
@@ -139,7 +146,7 @@ private fun ProfileTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color(0xFF0F0F1A))
+            .background(LightBackground)
             .padding(20.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -148,18 +155,18 @@ private fun ProfileTab(
             "My Profile",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = LightTextMain,
         )
 
         // Avatar + info card
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+            colors = CardDefaults.cardColors(containerColor = LightSurface),
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (busy && profile == null) {
-                    CircularProgressIndicator(color = Color(0xFF6C63FF), modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(color = BrandPurple, modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
                 profile?.let { p ->
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -168,7 +175,7 @@ private fun ProfileTab(
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(CircleShape)
-                                .background(Brush.linearGradient(listOf(Color(0xFF6C63FF), Color(0xFF48CAE4)))),
+                                .background(Brush.linearGradient(listOf(BrandPurple, Color(0xFF48CAE4)))),
                         ) {
                             Text(
                                 p.name.first().uppercaseChar().toString(),
@@ -178,9 +185,9 @@ private fun ProfileTab(
                             )
                         }
                         Column {
-                            Text(p.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 18.sp)
-                            Text(p.email, color = Color.Gray, fontSize = 13.sp)
-                            Text("Role: ${p.role} · ID: ${p.id}", color = Color.DarkGray, fontSize = 11.sp)
+                            Text(p.name, fontWeight = FontWeight.Bold, color = LightTextMain, fontSize = 18.sp)
+                            Text(p.email, color = LightTextMuted, fontSize = 13.sp)
+                            Text("Role: ${p.role} · ID: ${p.id}", color = LightTextDim, fontSize = 11.sp)
                         }
                     }
                 }
@@ -191,29 +198,32 @@ private fun ProfileTab(
             onClick = { vm.refreshProfile() },
             enabled = !busy,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A2E)),
+            colors = ButtonDefaults.buttonColors(containerColor = LightSurface),
             shape = RoundedCornerShape(12.dp),
         ) {
-            Icon(Icons.Default.Refresh, contentDescription = null, tint = Color(0xFF6C63FF))
+            Icon(Icons.Default.Refresh, contentDescription = null, tint = BrandPurple)
             Spacer(Modifier.width(8.dp))
-            Text("Refresh Profile", color = Color.White)
+            Text("Refresh Profile", color = LightTextMain)
         }
 
         Button(
             onClick = { vm.pingHealth() },
             enabled = !busy,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A2E)),
+            colors = ButtonDefaults.buttonColors(containerColor = LightSurface),
             shape = RoundedCornerShape(12.dp),
         ) {
-            Icon(Icons.Default.Analytics, contentDescription = null, tint = Color(0xFF11998E))
+            Icon(Icons.Default.Analytics, contentDescription = null, tint = BrandTeal)
             Spacer(Modifier.width(8.dp))
-            Text("Ping Server Health", color = Color.White)
+            Text("Ping Server Health", color = LightTextMain)
         }
 
         health?.let {
-            Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF11998E).copy(alpha = 0.15f)), shape = RoundedCornerShape(12.dp)) {
-                Text("  $it", color = Color(0xFF38EF7D), modifier = Modifier.padding(12.dp))
+            Card(
+                colors = CardDefaults.cardColors(containerColor = BrandTeal.copy(alpha = 0.10f)),
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Text("  $it", color = BrandTeal, modifier = Modifier.padding(12.dp))
             }
         }
 
@@ -240,7 +250,7 @@ private fun AssessTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color(0xFF0F0F1A))
+            .background(LightBackground)
             .padding(20.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -254,12 +264,12 @@ private fun AssessTab(
             modifier = Modifier
                 .size(140.dp)
                 .clip(CircleShape)
-                .background(Brush.radialGradient(listOf(Color(0xFF6C63FF).copy(alpha = 0.3f), Color.Transparent))),
+                .background(Brush.radialGradient(listOf(BrandPurple.copy(alpha = 0.15f), Color.Transparent))),
         ) {
             Icon(
                 Icons.Default.Analytics,
                 contentDescription = null,
-                tint = Color(0xFF6C63FF),
+                tint = BrandPurple,
                 modifier = Modifier.size(72.dp),
             )
         }
@@ -268,12 +278,12 @@ private fun AssessTab(
             "Mental Health Assessment",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.ExtraBold,
-            color = Color.White,
+            color = LightTextMain,
         )
         Text(
             "Answer a short questionnaire covering anxiety, stress, and depression to receive a personalised risk prediction powered by AI.",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
+            color = LightTextMuted,
             lineHeight = 22.sp,
         )
 
@@ -283,10 +293,10 @@ private fun AssessTab(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color(0xFF1A1A2E))
+                        .background(LightSurface)
                         .padding(horizontal = 14.dp, vertical = 7.dp),
                 ) {
-                    Text(tag, fontSize = 12.sp, color = Color(0xFFB0BEC5))
+                    Text(tag, fontSize = 12.sp, color = LightTextMuted)
                 }
             }
         }
@@ -298,7 +308,7 @@ private fun AssessTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C63FF)),
+            colors = ButtonDefaults.buttonColors(containerColor = BrandPurple),
             shape = RoundedCornerShape(16.dp),
         ) {
             Text("Start Assessment", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
@@ -308,16 +318,16 @@ private fun AssessTab(
 
         // Info footer card
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+            colors = CardDefaults.cardColors(containerColor = LightSurface),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("ℹ️ About this assessment", fontWeight = FontWeight.SemiBold, color = Color.White, fontSize = 13.sp)
+                Text("ℹ️ About this assessment", fontWeight = FontWeight.SemiBold, color = LightTextMain, fontSize = 13.sp)
                 Text(
                     "This tool uses a validated ML model trained on student survey data. Responses are stored securely. This is not a clinical diagnosis — please seek professional help if you are in distress.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
+                    color = LightTextMuted,
                     lineHeight = 18.sp,
                 )
             }
@@ -342,7 +352,7 @@ private fun HistoryTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color(0xFF0F0F1A)),
+            .background(LightBackground),
     ) {
         // Header
         Row(
@@ -356,27 +366,27 @@ private fun HistoryTab(
                 "Assessment History",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = LightTextMain,
             )
             TextButton(onClick = { vm.refreshHistory("weekly") }, enabled = !busy) {
-                Icon(Icons.Default.Refresh, contentDescription = null, tint = Color(0xFF6C63FF), modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Refresh, contentDescription = null, tint = BrandPurple, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Refresh", color = Color(0xFF6C63FF), fontSize = 13.sp)
+                Text("Refresh", color = BrandPurple, fontSize = 13.sp)
             }
         }
 
         when {
             busy && items.isEmpty() -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFF6C63FF))
+                    CircularProgressIndicator(color = BrandPurple)
                 }
             }
             items.isEmpty() -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(Icons.Default.History, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.size(64.dp))
-                        Text("No history yet", color = Color.Gray)
-                        Text("Complete an assessment to see results here", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                        Icon(Icons.Default.History, contentDescription = null, tint = LightTextMuted, modifier = Modifier.size(64.dp))
+                        Text("No history yet", color = LightTextMuted)
+                        Text("Complete an assessment to see results here", style = MaterialTheme.typography.bodySmall, color = LightTextDim)
                     }
                 }
             }
@@ -410,7 +420,7 @@ private fun HistoryCard(
     val prob = item.probability?.let { "${(it * 100).toInt()}%" } ?: "—"
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+        colors = CardDefaults.cardColors(containerColor = LightSurface),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -427,7 +437,7 @@ private fun HistoryCard(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(color.copy(alpha = 0.15f)),
+                    .background(color.copy(alpha = 0.12f)),
             ) {
                 Icon(Icons.Default.Analytics, contentDescription = null, tint = color, modifier = Modifier.size(26.dp))
             }
@@ -443,17 +453,17 @@ private fun HistoryCard(
                 Text(
                     item.createdAt.take(16).replace("T", " · "),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
+                    color = LightTextMuted,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ScorePill("A", item.anxietyScore, Color(0xFFF7971E))
                     ScorePill("S", item.stressScore, Color(0xFF11998E))
-                    ScorePill("D", item.depressionScore, Color(0xFF6C63FF))
+                    ScorePill("D", item.depressionScore, BrandPurple)
                     if (prob != "—") {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(6.dp))
-                                .background(color.copy(alpha = 0.15f))
+                                .background(color.copy(alpha = 0.12f))
                                 .padding(horizontal = 6.dp, vertical = 2.dp),
                         ) {
                             Text(prob, fontSize = 10.sp, color = color, fontWeight = FontWeight.Bold)
@@ -466,7 +476,7 @@ private fun HistoryCard(
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "View Details",
-                tint = Color.DarkGray,
+                tint = LightTextMuted,
                 modifier = Modifier.size(18.dp),
             )
         }
@@ -478,7 +488,7 @@ private fun ScorePill(prefix: String, score: Double?, color: Color) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
-            .background(color.copy(alpha = 0.12f))
+            .background(color.copy(alpha = 0.10f))
             .padding(horizontal = 6.dp, vertical = 2.dp),
     ) {
         Text(

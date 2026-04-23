@@ -66,6 +66,15 @@ import androidx.compose.ui.unit.sp
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import yug.ramoliya.ojtapp.ui.StudentAppViewModel
+import yug.ramoliya.ojtapp.ui.theme.BrandPurple
+import yug.ramoliya.ojtapp.ui.theme.LightBackground
+import yug.ramoliya.ojtapp.ui.theme.LightBorder
+import yug.ramoliya.ojtapp.ui.theme.LightSurface
+import yug.ramoliya.ojtapp.ui.theme.LightSurface2
+import yug.ramoliya.ojtapp.ui.theme.LightSurface3
+import yug.ramoliya.ojtapp.ui.theme.LightTextDim
+import yug.ramoliya.ojtapp.ui.theme.LightTextMain
+import yug.ramoliya.ojtapp.ui.theme.LightTextMuted
 
 // ─────────────────────────── option maps ────────────────────────────────── //
 
@@ -107,8 +116,6 @@ private val CGPA_OPTIONS = listOf(
 )
 private val SCHOLARSHIP_OPTIONS = listOf("Yes", "No")
 
-// Anxiety / Depression scale: 0 = Not at all, 1 = Several days,
-//   2 = More than half the days, 3 = Nearly every day
 private val ANXIETY_DEPRESSION_LABELS = listOf(
     "Not at all",
     "Several days",
@@ -116,8 +123,6 @@ private val ANXIETY_DEPRESSION_LABELS = listOf(
     "Nearly every day",
 )
 
-// Stress scale: 0 = Never, 1 = Almost Never, 2 = Sometimes,
-//   3 = Fairly Often, 4 = Very Often
 private val STRESS_LABELS = listOf(
     "Never",
     "Almost Never",
@@ -126,7 +131,7 @@ private val STRESS_LABELS = listOf(
     "Very Often",
 )
 
-// ─────────────────────── question definitions ───────────────────────────── //
+// ─────────────────────────── question definitions ───────────────────────── //
 
 data class QuizQuestion(val key: String, val text: String, val isInt: Boolean = true)
 
@@ -174,10 +179,8 @@ fun AssessmentScreen(
 ) {
     val busy by vm.busy.collectAsState()
 
-    // Current step: 0=Demographics, 1=Anxiety, 2=Stress, 3=Depression
     var step by remember { mutableIntStateOf(0) }
 
-    // Categorical answers
     var age by remember { mutableStateOf(AGE_OPTIONS[0]) }
     var gender by remember { mutableStateOf(GENDER_OPTIONS[0]) }
     var university by remember { mutableStateOf(UNIVERSITY_OPTIONS[0]) }
@@ -186,7 +189,6 @@ fun AssessmentScreen(
     var cgpa by remember { mutableStateOf(CGPA_OPTIONS[0]) }
     var scholarship by remember { mutableStateOf(SCHOLARSHIP_OPTIONS[0]) }
 
-    // Likert answers stored as key → Int
     val answers = remember {
         mutableStateMapOf<String, Int>().apply {
             ANXIETY_QUESTIONS.forEach { put(it.key, 1) }
@@ -198,10 +200,6 @@ fun AssessmentScreen(
     val totalSteps = 4
     val stepLabels = listOf("Demographics", "Anxiety", "Stress", "Depression")
 
-    val primaryGradient = Brush.horizontalGradient(
-        colors = listOf(Color(0xFF6C63FF), Color(0xFF48CAE4))
-    )
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -212,13 +210,13 @@ fun AssessmentScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1A1A2E),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
+                    containerColor        = LightSurface,
+                    titleContentColor     = LightTextMain,
+                    navigationIconContentColor = LightTextMain,
                 ),
             )
         },
-        containerColor = Color(0xFF0F0F1A),
+        containerColor = LightBackground,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -229,7 +227,7 @@ fun AssessmentScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF1A1A2E))
+                    .background(LightSurface)
                     .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -246,16 +244,22 @@ fun AssessmentScreen(
                                     .weight(1f)
                                     .clip(RoundedCornerShape(20.dp))
                                     .background(
-                                        if (done) Color(0xFF6C63FF)
-                                        else if (active) Color(0xFF6C63FF).copy(alpha = 0.3f)
-                                        else Color(0xFF2A2A3E)
+                                        when {
+                                            done   -> BrandPurple
+                                            active -> BrandPurple.copy(alpha = 0.20f)
+                                            else   -> LightBorder
+                                        }
                                     )
                                     .padding(vertical = 6.dp),
                             ) {
                                 Text(
                                     text = label,
                                     fontSize = 10.sp,
-                                    color = if (active || done) Color.White else Color.Gray,
+                                    color = when {
+                                        done   -> Color.White
+                                        active -> BrandPurple
+                                        else   -> LightTextMuted
+                                    },
                                     fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
                                     textAlign = TextAlign.Center,
                                 )
@@ -265,8 +269,8 @@ fun AssessmentScreen(
                     LinearProgressIndicator(
                         progress = { (step + 1).toFloat() / totalSteps },
                         modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
-                        color = Color(0xFF6C63FF),
-                        trackColor = Color(0xFF2A2A3E),
+                        color = BrandPurple,
+                        trackColor = LightBorder,
                     )
                 }
             }
@@ -320,7 +324,7 @@ fun AssessmentScreen(
                         3 -> LikertStep(
                             title = "Depression Questions",
                             subtitle = "In this semester, how often…",
-                            color = Color(0xFF6C63FF),
+                            color = BrandPurple,
                             questions = DEPRESSION_QUESTIONS,
                             scaleLabels = ANXIETY_DEPRESSION_LABELS,
                             answers = answers,
@@ -333,7 +337,7 @@ fun AssessmentScreen(
             // ── nav buttons ───────────────────────────────────────────── //
             Surface(
                 shadowElevation = 8.dp,
-                color = Color(0xFF1A1A2E),
+                color = LightSurface,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
@@ -346,16 +350,16 @@ fun AssessmentScreen(
                     // Back button
                     Button(
                         onClick = { if (step > 0) step-- else onBack() },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A3E)),
+                        colors = ButtonDefaults.buttonColors(containerColor = LightBorder),
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = LightTextMain,
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Back", color = Color.White)
+                        Text("Back", color = LightTextMain)
                     }
 
                     // Step indicator dots
@@ -366,9 +370,11 @@ fun AssessmentScreen(
                                     .size(if (i == step) 10.dp else 6.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (i == step) Color(0xFF6C63FF)
-                                        else if (i < step) Color(0xFF6C63FF).copy(alpha = 0.5f)
-                                        else Color(0xFF2A2A3E)
+                                        when {
+                                            i == step -> BrandPurple
+                                            i < step  -> BrandPurple.copy(alpha = 0.4f)
+                                            else      -> LightBorder
+                                        }
                                     ),
                             )
                         }
@@ -378,7 +384,7 @@ fun AssessmentScreen(
                     if (step < totalSteps - 1) {
                         Button(
                             onClick = { step++ },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C63FF)),
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandPurple),
                             shape = RoundedCornerShape(12.dp),
                         ) {
                             Text("Next", color = Color.White)
@@ -399,7 +405,7 @@ fun AssessmentScreen(
                                 vm.predictAndSave(indicators, onResult)
                             },
                             enabled = !busy,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C63FF)),
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandPurple),
                             shape = RoundedCornerShape(12.dp),
                         ) {
                             if (busy) {
@@ -430,7 +436,7 @@ private fun DemographicsStep(
     onYear: (String) -> Unit, onCgpa: (String) -> Unit,
     onScholarship: (String) -> Unit,
 ) {
-    StepHeader("Your Background", "Tell us a bit about yourself", Color(0xFF48CAE4))
+    StepHeader("Your Background", "Tell us a bit about yourself", Color(0xFF0097B2))
     DropdownField("Age Group", age, AGE_OPTIONS, onAge)
     DropdownField("Gender", gender, GENDER_OPTIONS, onGender)
     DropdownField("University", university, UNIVERSITY_OPTIONS, onUniversity)
@@ -477,7 +483,7 @@ private fun StepHeader(title: String, subtitle: String, color: Color) {
         Text(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
+            color = LightTextMuted,
         )
     }
 }
@@ -499,26 +505,26 @@ private fun DropdownField(
             value = value,
             onValueChange = {},
             readOnly = true,
-            label = { Text(label, color = Color.Gray) },
+            label = { Text(label, color = LightTextMuted) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
             colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedBorderColor = Color(0xFF6C63FF),
-                unfocusedBorderColor = Color(0xFF2A2A3E),
-                focusedContainerColor = Color(0xFF1E1E30),
-                unfocusedContainerColor = Color(0xFF1E1E30),
+                focusedTextColor        = LightTextMain,
+                unfocusedTextColor      = LightTextMain,
+                focusedBorderColor      = BrandPurple,
+                unfocusedBorderColor    = LightBorder,
+                focusedContainerColor   = LightSurface,
+                unfocusedContainerColor = LightSurface,
             ),
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(Color(0xFF1E1E30)),
+            modifier = Modifier.background(LightSurface2),
         ) {
             options.forEach { opt ->
                 DropdownMenuItem(
-                    text = { Text(opt, color = Color.White) },
+                    text = { Text(opt, color = LightTextMain) },
                     onClick = { onSelect(opt); expanded = false },
                 )
             }
@@ -535,7 +541,7 @@ private fun LikertCard(
     onSelect: (Int) -> Unit,
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E30)),
+        colors = CardDefaults.cardColors(containerColor = LightSurface),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -546,7 +552,7 @@ private fun LikertCard(
             Text(
                 text = question,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFFE0E0E0),
+                color = LightTextMain,
                 lineHeight = 20.sp,
             )
             // Scale buttons
@@ -562,12 +568,12 @@ private fun LikertCard(
                             .clip(RoundedCornerShape(10.dp))
                             .border(
                                 width = if (isSelected) 2.dp else 1.dp,
-                                color = if (isSelected) accentColor else Color(0xFF2A2A3E),
+                                color = if (isSelected) accentColor else LightBorder,
                                 shape = RoundedCornerShape(10.dp),
                             )
                             .background(
-                                if (isSelected) accentColor.copy(alpha = 0.2f)
-                                else Color(0xFF16162A)
+                                if (isSelected) accentColor.copy(alpha = 0.12f)
+                                else LightSurface3
                             )
                             .clickable { onSelect(idx) }
                             .padding(vertical = 8.dp, horizontal = 4.dp),
@@ -575,16 +581,16 @@ private fun LikertCard(
                         verticalArrangement = Arrangement.Center,
                     ) {
                         Text(
-                            text = "${idx}",
+                            text = "$idx",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = if (isSelected) accentColor else Color.Gray,
+                            color = if (isSelected) accentColor else LightTextMuted,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = label,
                             fontSize = 8.sp,
-                            color = if (isSelected) accentColor.copy(alpha = 0.9f) else Color.DarkGray,
+                            color = if (isSelected) accentColor else LightTextDim,
                             textAlign = TextAlign.Center,
                             lineHeight = 10.sp,
                         )

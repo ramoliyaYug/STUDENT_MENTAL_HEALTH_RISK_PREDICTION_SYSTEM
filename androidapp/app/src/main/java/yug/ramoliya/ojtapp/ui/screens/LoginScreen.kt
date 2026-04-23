@@ -48,6 +48,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import yug.ramoliya.ojtapp.ui.StudentAppViewModel
+import yug.ramoliya.ojtapp.ui.theme.BrandPurple
+import yug.ramoliya.ojtapp.ui.theme.BrandTeal
+import yug.ramoliya.ojtapp.ui.theme.LightBackground
+import yug.ramoliya.ojtapp.ui.theme.LightTextMain
+import yug.ramoliya.ojtapp.ui.theme.LightTextMuted
 
 @Composable
 fun LoginScreen(
@@ -63,7 +68,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F0F1A)),
+            .background(LightBackground),
     ) {
         // Background gradient blob
         Box(
@@ -72,7 +77,7 @@ fun LoginScreen(
                 .clip(CircleShape)
                 .background(
                     Brush.radialGradient(
-                        listOf(Color(0xFF6C63FF).copy(alpha = 0.18f), Color.Transparent)
+                        listOf(BrandPurple.copy(alpha = 0.12f), Color.Transparent)
                     )
                 )
                 .align(Alignment.TopCenter),
@@ -94,7 +99,7 @@ fun LoginScreen(
                     .clip(RoundedCornerShape(24.dp))
                     .background(
                         Brush.linearGradient(
-                            listOf(Color(0xFF6C63FF), Color(0xFF48CAE4))
+                            listOf(BrandPurple, Color(0xFF48CAE4))
                         )
                     ),
             ) {
@@ -112,14 +117,14 @@ fun LoginScreen(
                 "Welcome Back",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
+                color = LightTextMain,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(6.dp))
             Text(
                 "Sign in to continue your mental health journey",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = LightTextMuted,
                 textAlign = TextAlign.Center,
                 lineHeight = 20.sp,
             )
@@ -132,7 +137,7 @@ fun LoginScreen(
                 onValueChange = { email = it },
                 label = "Email address",
                 leadingIcon = {
-                    Icon(Icons.Default.Email, contentDescription = null, tint = Color(0xFF6C63FF), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Email, contentDescription = null, tint = BrandPurple, modifier = Modifier.size(20.dp))
                 },
                 keyboardType = KeyboardType.Email,
             )
@@ -144,7 +149,7 @@ fun LoginScreen(
                 onValueChange = { password = it },
                 label = "Password",
                 leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF6C63FF), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Lock, contentDescription = null, tint = BrandPurple, modifier = Modifier.size(20.dp))
                 },
                 keyboardType = KeyboardType.Password,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -153,7 +158,7 @@ fun LoginScreen(
                         Icon(
                             if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = null,
-                            tint = Color.Gray,
+                            tint = LightTextMuted,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -170,8 +175,8 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6C63FF),
-                    disabledContainerColor = Color(0xFF6C63FF).copy(alpha = 0.4f),
+                    containerColor = BrandPurple,
+                    disabledContainerColor = BrandPurple.copy(alpha = 0.4f),
                 ),
                 shape = RoundedCornerShape(16.dp),
             ) {
@@ -192,11 +197,11 @@ fun LoginScreen(
 
             // ── Register link ────────────────────────────────────────── //
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Don't have an account?", color = Color.Gray, fontSize = 14.sp)
+                Text("Don't have an account?", color = LightTextMuted, fontSize = 14.sp)
                 TextButton(onClick = onRegister) {
                     Text(
                         "Create account",
-                        color = Color(0xFF48CAE4),
+                        color = BrandTeal,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
                     )

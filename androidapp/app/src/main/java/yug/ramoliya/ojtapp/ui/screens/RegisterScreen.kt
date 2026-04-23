@@ -53,6 +53,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import yug.ramoliya.ojtapp.ui.StudentAppViewModel
+import yug.ramoliya.ojtapp.ui.theme.BrandPurple
+import yug.ramoliya.ojtapp.ui.theme.BrandTeal
+import yug.ramoliya.ojtapp.ui.theme.LightBackground
+import yug.ramoliya.ojtapp.ui.theme.LightBorder
+import yug.ramoliya.ojtapp.ui.theme.LightSurface
+import yug.ramoliya.ojtapp.ui.theme.LightTextMain
+import yug.ramoliya.ojtapp.ui.theme.LightTextMuted
 
 @Composable
 fun RegisterScreen(
@@ -69,7 +76,7 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F0F1A)),
+            .background(LightBackground),
     ) {
         // Background gradient blob
         Box(
@@ -78,7 +85,7 @@ fun RegisterScreen(
                 .clip(CircleShape)
                 .background(
                     Brush.radialGradient(
-                        listOf(Color(0xFF48CAE4).copy(alpha = 0.15f), Color.Transparent)
+                        listOf(BrandTeal.copy(alpha = 0.10f), Color.Transparent)
                     )
                 )
                 .align(Alignment.TopCenter),
@@ -99,7 +106,7 @@ fun RegisterScreen(
                     .clip(RoundedCornerShape(24.dp))
                     .background(
                         Brush.linearGradient(
-                            listOf(Color(0xFF48CAE4), Color(0xFF6C63FF))
+                            listOf(BrandTeal, BrandPurple)
                         )
                     ),
             ) {
@@ -117,14 +124,14 @@ fun RegisterScreen(
                 "Create Account",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
+                color = LightTextMain,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(6.dp))
             Text(
                 "Start tracking your mental wellness today",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = LightTextMuted,
                 textAlign = TextAlign.Center,
                 lineHeight = 20.sp,
             )
@@ -137,7 +144,7 @@ fun RegisterScreen(
                 onValueChange = { name = it },
                 label = "Full name",
                 leadingIcon = {
-                    Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF48CAE4), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Person, contentDescription = null, tint = BrandTeal, modifier = Modifier.size(20.dp))
                 },
                 keyboardType = KeyboardType.Text,
             )
@@ -149,7 +156,7 @@ fun RegisterScreen(
                 onValueChange = { email = it },
                 label = "Email address",
                 leadingIcon = {
-                    Icon(Icons.Default.Email, contentDescription = null, tint = Color(0xFF48CAE4), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Email, contentDescription = null, tint = BrandTeal, modifier = Modifier.size(20.dp))
                 },
                 keyboardType = KeyboardType.Email,
             )
@@ -161,7 +168,7 @@ fun RegisterScreen(
                 onValueChange = { password = it },
                 label = "Password",
                 leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF48CAE4), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Lock, contentDescription = null, tint = BrandTeal, modifier = Modifier.size(20.dp))
                 },
                 keyboardType = KeyboardType.Password,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -170,7 +177,7 @@ fun RegisterScreen(
                         Icon(
                             if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = null,
-                            tint = Color.Gray,
+                            tint = LightTextMuted,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -187,8 +194,8 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF48CAE4),
-                    disabledContainerColor = Color(0xFF48CAE4).copy(alpha = 0.4f),
+                    containerColor = BrandTeal,
+                    disabledContainerColor = BrandTeal.copy(alpha = 0.4f),
                 ),
                 shape = RoundedCornerShape(16.dp),
             ) {
@@ -209,11 +216,11 @@ fun RegisterScreen(
 
             // ── Back to login ────────────────────────────────────────── //
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Already have an account?", color = Color.Gray, fontSize = 14.sp)
+                Text("Already have an account?", color = LightTextMuted, fontSize = 14.sp)
                 TextButton(onClick = onBack) {
                     Text(
                         "Sign in",
-                        color = Color(0xFF6C63FF),
+                        color = BrandPurple,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
                     )
@@ -238,7 +245,7 @@ internal fun AuthTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color.Gray, fontSize = 13.sp) },
+        label = { Text(label, color = LightTextMuted, fontSize = 13.sp) },
         singleLine = true,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
@@ -247,14 +254,14 @@ internal fun AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedBorderColor = Color(0xFF6C63FF),
-            unfocusedBorderColor = Color(0xFF2A2A3E),
-            focusedContainerColor = Color(0xFF1A1A2E),
-            unfocusedContainerColor = Color(0xFF1A1A2E),
-            cursorColor = Color(0xFF6C63FF),
-            focusedLabelColor = Color(0xFF6C63FF),
+            focusedTextColor       = LightTextMain,
+            unfocusedTextColor     = LightTextMain,
+            focusedBorderColor     = BrandPurple,
+            unfocusedBorderColor   = LightBorder,
+            focusedContainerColor  = LightSurface,
+            unfocusedContainerColor = LightSurface,
+            cursorColor            = BrandPurple,
+            focusedLabelColor      = BrandPurple,
         ),
     )
 }

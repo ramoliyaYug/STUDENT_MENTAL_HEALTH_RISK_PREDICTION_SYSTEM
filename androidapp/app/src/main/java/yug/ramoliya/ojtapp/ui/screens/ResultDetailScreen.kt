@@ -46,6 +46,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import yug.ramoliya.ojtapp.data.model.ShapValue
 import yug.ramoliya.ojtapp.data.model.StudentIndicatorResponse
+import yug.ramoliya.ojtapp.ui.theme.LightBackground
+import yug.ramoliya.ojtapp.ui.theme.LightBorder
+import yug.ramoliya.ojtapp.ui.theme.LightSurface
+import yug.ramoliya.ojtapp.ui.theme.LightTextDim
+import yug.ramoliya.ojtapp.ui.theme.LightTextMain
+import yug.ramoliya.ojtapp.ui.theme.LightTextMuted
 import kotlin.math.roundToInt
 
 // ─── risk color mapping ────────────────────────────────────────────────── //
@@ -60,9 +66,9 @@ fun riskColor(risk: String): Color = when {
 fun labelColor(label: String?): Color = when {
     label == null -> Color.Gray
     label.contains("Minimal", ignoreCase = true)  -> Color(0xFF00C853)
-    label.contains("Mild",    ignoreCase = true)   -> Color(0xFFCDDC39)
-    label.contains("Moderate",ignoreCase = true)   -> Color(0xFFFFA726)
-    label.contains("Severe",  ignoreCase = true)   -> Color(0xFFEF5350)
+    label.contains("Mild",    ignoreCase = true)   -> Color(0xFF7CB342) // Adjusted for light mode
+    label.contains("Moderate",ignoreCase = true)   -> Color(0xFFFB8C00) // Adjusted for light mode
+    label.contains("Severe",  ignoreCase = true)   -> Color(0xFFD32F2F) // Adjusted for light mode
     else -> Color.Gray
 }
 
@@ -85,13 +91,13 @@ fun ResultDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1A1A2E),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
+                    containerColor = LightSurface,
+                    titleContentColor = LightTextMain,
+                    navigationIconContentColor = LightTextMain,
                 ),
             )
         },
-        containerColor = Color(0xFF0F0F1A),
+        containerColor = LightBackground,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -109,7 +115,7 @@ fun ResultDetailScreen(
                 "Dimension Scores",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = LightTextMain,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 ScoreCard(
@@ -165,16 +171,17 @@ private fun RiskBanner(result: StudentIndicatorResponse) {
     val prob = result.probability?.let { (it * 100).roundToInt() } ?: 0
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+        colors = CardDefaults.cardColors(containerColor = LightSurface),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     Brush.horizontalGradient(
-                        listOf(color.copy(alpha = 0.15f), Color.Transparent)
+                        listOf(color.copy(alpha = 0.10f), Color.Transparent)
                     )
                 )
                 .padding(20.dp),
@@ -188,7 +195,7 @@ private fun RiskBanner(result: StudentIndicatorResponse) {
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(color.copy(alpha = 0.2f))
+                        .background(color.copy(alpha = 0.12f))
                         .padding(4.dp),
                 ) {
                     Icon(
@@ -210,7 +217,7 @@ private fun RiskBanner(result: StudentIndicatorResponse) {
                 Text(
                     text = "Prediction confidence: $prob%",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
+                    color = LightTextMuted,
                 )
                 Spacer(Modifier.height(12.dp))
                 LinearProgressIndicator(
@@ -220,18 +227,18 @@ private fun RiskBanner(result: StudentIndicatorResponse) {
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp)),
                     color = color,
-                    trackColor = Color(0xFF2A2A3E),
+                    trackColor = LightBorder,
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
                     "Model: ${result.modelUsed}",
                     fontSize = 11.sp,
-                    color = Color.DarkGray,
+                    color = LightTextDim,
                 )
                 Text(
                     "Assessment: ${result.createdAt.take(16).replace("T", " at ")}",
                     fontSize = 11.sp,
-                    color = Color.DarkGray,
+                    color = LightTextDim,
                 )
             }
         }
@@ -251,9 +258,10 @@ private fun ScoreCard(
 ) {
     val lColor = labelColor(resultLabel)
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+        colors = CardDefaults.cardColors(containerColor = LightSurface),
         shape = RoundedCornerShape(16.dp),
         modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -269,12 +277,12 @@ private fun ScoreCard(
             ) {
                 Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(26.dp))
             }
-            Text(label, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+            Text(label, fontSize = 12.sp, color = LightTextMuted, fontWeight = FontWeight.Medium)
             Text(
                 text = score?.let { "%.1f".format(it) } ?: "—",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
+                color = LightTextMain,
             )
             Text(
                 text = resultLabel ?: "—",
@@ -293,7 +301,7 @@ private fun ScoreCard(
 @Composable
 private fun ExplainabilitySection(items: List<ShapValue>) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+        colors = CardDefaults.cardColors(containerColor = LightSurface),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -302,12 +310,12 @@ private fun ExplainabilitySection(items: List<ShapValue>) {
                 "Top Influencing Factors",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = LightTextMain,
             )
             Text(
                 "SHAP values indicate how much each feature contributed to the prediction.",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
+                color = LightTextMuted,
             )
             items.forEachIndexed { idx, shap ->
                 ShapRow(rank = idx + 1, shap = shap, maxAbs = items.maxOf { it.absShapValue })
@@ -363,14 +371,14 @@ private fun ShapRow(rank: Int, shap: ShapValue, maxAbs: Double) {
                     modifier = Modifier
                         .size(22.dp)
                         .clip(CircleShape)
-                        .background(barColor.copy(alpha = 0.2f)),
+                        .background(barColor.copy(alpha = 0.12f)),
                 ) {
                     Text("$rank", fontSize = 10.sp, color = barColor, fontWeight = FontWeight.Bold)
                 }
                 Text(
                     shapFeatureLabel(shap.feature),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFFE0E0E0),
+                    color = LightTextMain,
                 )
             }
             Text(
@@ -384,7 +392,7 @@ private fun ShapRow(rank: Int, shap: ShapValue, maxAbs: Double) {
             progress = { barWidth },
             modifier = Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)),
             color = barColor,
-            trackColor = Color(0xFF2A2A3E),
+            trackColor = LightBorder,
         )
     }
 }
@@ -394,7 +402,7 @@ private fun ShapRow(rank: Int, shap: ShapValue, maxAbs: Double) {
 @Composable
 private fun FullJsonSection(result: StudentIndicatorResponse) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+        colors = CardDefaults.cardColors(containerColor = LightSurface),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -403,7 +411,7 @@ private fun FullJsonSection(result: StudentIndicatorResponse) {
                 "Assessment Information",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = LightTextMain,
             )
             InfoRow("Assessment ID", "#${result.id}")
             InfoRow("Student ID",    "#${result.studentId}")
@@ -419,13 +427,13 @@ private fun FullJsonSection(result: StudentIndicatorResponse) {
 }
 
 @Composable
-private fun InfoRow(label: String, value: String, valueColor: Color = Color(0xFFB0BEC5)) {
+private fun InfoRow(label: String, value: String, valueColor: Color = LightTextMuted) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top,
     ) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = Color.Gray, modifier = Modifier.weight(0.45f))
+        Text(label, style = MaterialTheme.typography.bodySmall, color = LightTextMuted, modifier = Modifier.weight(0.45f))
         Spacer(Modifier.width(8.dp))
         Text(
             value,
