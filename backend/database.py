@@ -6,7 +6,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 # Example:
 # DATABASE_URL = "postgresql+psycopg2://user:password@localhost:5432/student_mental_health"
-DATABASE_URL = "postgresql://postgres:Yug%40112007@localhost:5432/student_mental_health"
+# DATABASE_URL = "postgresql://postgres:Yug%40112007@localhost:5432/student_mental_health"
+DATABASE_URL = "postgresql://postgres:yug112007@stdmentalhealthojt.czc2g2m46gl0.ap-south-1.rds.amazonaws.com:5432/postgres"
 
 engine = create_engine(DATABASE_URL, echo=False, future=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=Session)

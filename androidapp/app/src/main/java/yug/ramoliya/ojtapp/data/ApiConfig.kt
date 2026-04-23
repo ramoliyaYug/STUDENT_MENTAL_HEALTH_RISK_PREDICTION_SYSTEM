@@ -10,5 +10,5 @@ package yug.ramoliya.ojtapp.data
  * - **HTTPS production** → e.g. `https://api.example.com/api/v1/`
  */
 object ApiConfig {
-    const val BASE_URL: String = "http://10.0.2.2:8000/api/v1/"
+    const val BASE_URL: String = "http://13.205.252.252:8000/api/v1/"
 }
